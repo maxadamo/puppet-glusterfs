@@ -14,32 +14,38 @@ You will need to open TCP ports 24007:24009 and 38465:38466 on the servers.
 
 ## Examples
 
-Complete server with two redundant nodes, on top of existing kickstart created vg0 LVM VGs (while this example works, instead of `exec`, you'd better use `logical_volume`, `filesystem` and `mount` resources). Note that the first runs will fail since the volume
-creation won't work until the peers know each other, and that requires the
-service to be running:
+Complete server with two redundant nodes, on top of existing kickstart created vg0 LVM VGs.
+Note that the first runs will fail since the volume creation won't work until
+the peers know each other, and that requires the service to be running:
 
 ```puppet
+    $mypeer = $::hostname ? {
+      'server1' => '192.168.0.2',
+      'server2' => '192.168.0.1',
+    }
     file { [ '/export', '/export/gv0' ]:
-      seltype => 'usr_t',
       ensure  => directory,
+      seltype => 'usr_t',
     }
-    package { 'xfsprogs': ensure => installed }
-    exec { 'lvcreate /dev/vg0/gv0':
-      command => '/sbin/lvcreate -L 256G -n gv0 vg0',
-      creates => '/dev/vg0/gv0',
-      notify  => Exec['mkfs /dev/vg0/gv0'],
+    logical_volume { 'lv_glusterfs':
+      ensure       => present,
+      volume_group => 'rootvg',
+      size         => '4G';
     }
-    exec { 'mkfs /dev/vg0/gv0':
-      command     => '/sbin/mkfs.xfs -i size=512 /dev/vg0/gv0',
-      require     => [ Package['xfsprogs'], Exec['lvcreate /dev/vg0/gv0'] ],
-      refreshonly => true,
+    filesystem { '/dev/mapper/rootvg-lv_glusterfs':
+      ensure  => present,
+      fs_type => 'ext4',
+      require => Logical_volume['lv_glusterfs'];
     }
     mount { '/export/gv0':
-      device  => '/dev/vg0/gv0',
-      fstype  => 'xfs',
-      options => 'defaults',
       ensure  => mounted,
-      require => [ Exec['mkfs /dev/vg0/gv0'], File['/export/gv0'] ],
+      device  => '/dev/mapper/rootvg-lv_glusterfs',
+      fstype  => 'ext4',
+      options => 'defaults',
+      require => [
+        Filesystem['/dev/mapper/rootvg-lv_glusterfs'],
+        File['/export/gv0']
+      ];
     }
     class { 'glusterfs::server':
       peers => $::hostname ? {
@@ -68,8 +74,8 @@ on the same hardware for optimal performance and optimal fail-over :
 ```
 
 ## Note
-This is a fork of `thias-glusterfs`. 
+This is a fork of `thias-glusterfs`.
 It's merely the same, apart from:
 
-- `yes` command prepended to volume creation, to skip the user interaction to confirm the operation. 
+- `yes` command prepended to volume creation, to skip the user interaction to confirm the operation.
 - minor fixes against puppet-lint
