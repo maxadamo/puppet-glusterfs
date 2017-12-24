@@ -14,11 +14,11 @@ You will need to open TCP ports 24007:24009 and 38465:38466 on the servers.
 
 ## Examples
 
-Complete server with two redundant nodes, on top of existing kickstart
-created vg0 LVM VGs. Note that the first runs will fail since the volume
+Complete server with two redundant nodes, on top of existing kickstart created vg0 LVM VGs (while this example works, instead of `exec`, you'd better use `logical_volume`, `filesystem` and `mount` resources). Note that the first runs will fail since the volume
 creation won't work until the peers know each other, and that requires the
-service to be running :
+service to be running:
 
+```puppet
     file { [ '/export', '/export/gv0' ]:
       seltype => 'usr_t',
       ensure  => directory,
@@ -51,11 +51,13 @@ service to be running :
       create_options => 'replica 2 192.168.0.1:/export/gv0 192.168.0.2:/export/gv0',
       require        => Mount['/export/gv0'],
     }
+```
 
 Client mount (the client class is included automatically). Note that clients
 are virtual machines on the servers above, so make each of them use the replica
 on the same hardware for optimal performance and optimal fail-over :
 
+```puppet
     file { '/var/www': ensure => directory }
     glusterfs::mount { '/var/www':
       device => $::hostname ? {
@@ -63,3 +65,11 @@ on the same hardware for optimal performance and optimal fail-over :
         'client2' => '192.168.0.2:/gv0',
       }
     }
+```
+
+## Note
+This is a fork of `thias-glusterfs`. 
+It's merely the same, apart from:
+
+- `yes` command prepended to volume creation, to skip the user interaction to confirm the operation. 
+- minor fixes against puppet-lint
