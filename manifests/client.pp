@@ -4,7 +4,6 @@
 #
 class glusterfs::client {
 
-  package { 'glusterfs-fuse': ensure => installed }
+  package { 'glusterfs-fuse': ensure => installed; }
 
 }
-

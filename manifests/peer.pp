@@ -12,4 +12,3 @@ define glusterfs::peer () {
   }
 
 }
-

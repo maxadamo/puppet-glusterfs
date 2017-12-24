@@ -63,4 +63,3 @@ on the same hardware for optimal performance and optimal fail-over :
         'client2' => '192.168.0.2:/gv0',
       }
     }
-

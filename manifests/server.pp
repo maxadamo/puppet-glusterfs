@@ -21,8 +21,8 @@ class glusterfs::server (
   # Main package and service it provides
   package { 'glusterfs-server': ensure => installed }
   service { 'glusterd':
-    enable    => true,
     ensure    => running,
+    enable    => true,
     hasstatus => true,
     require   => Package['glusterfs-server'],
   }
@@ -31,4 +31,3 @@ class glusterfs::server (
   glusterfs::peer { $peers: }
 
 }
-

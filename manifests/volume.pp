@@ -11,17 +11,16 @@ define glusterfs::volume (
   $create_options
 ) {
 
-  exec { "gluster volume create ${title}":
-    command => "/usr/sbin/gluster volume create ${title} ${create_options}",
-    creates => "/var/lib/glusterd/vols/${title}",
-    require => Class['glusterfs::server'],
-  }
-
-  exec { "/usr/sbin/gluster volume start ${title}":
-    unless  => "[ \"`gluster volume info ${title} | egrep '^Status:'`\" = 'Status: Started' ]",
-    path    => [ '/usr/sbin', '/usr/bin', '/sbin', '/bin' ],
-    require => Exec["gluster volume create ${title}"],
+  exec {
+    default:
+      path => ['/usr/sbin', '/usr/bin', '/sbin', '/bin'];
+    "gluster volume create ${title}":
+      command => "yes | gluster volume create ${title} ${create_options}",
+      creates => "/var/lib/glusterd/vols/${title}",
+      require => Class['glusterfs::server'];
+    "/usr/sbin/gluster volume start ${title}":
+      unless  => "[ \"`gluster volume info ${title} | egrep '^Status:'`\" = 'Status: Started' ]",
+      require => Exec["gluster volume create ${title}"];
   }
 
 }
-
