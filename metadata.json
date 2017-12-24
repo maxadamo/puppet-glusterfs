@@ -22,12 +22,11 @@
     "spec/classes/init_spec.rb": "712cda8d0bacfe46f564514b08809102",
     "README.md": "b3fc89dfd0e7c1e04753055f03157816",
     "ChangeLog": "a51dbccc9d3712e64f98080f5265ce26",
-    "Modulefile": "a2f0509a80877c90b2bc2c39dde39d46",
     "manifests/client.pp": "6a70678c46d4adf03765da015e0a4b3d",
     "manifests/peer.pp": "397260ed0b240ee2adf8c2160b087982",
     "manifests/volume.pp": "e2648c4ad72c47e4a6b849303b77776f",
     "manifests/server.pp": "da3f000a3b43ff706fa0ace985ea6d35",
-    "manifests/mount.pp": "4f36c8a55498bfa471cbf47e5aed3565",
+    "manifests/mount.pp": "f33cbdd7254d030a93f2750d03182580",
     "Rakefile": "f4692851f7e9afcdb02721319e3f18b9",
     "Gemfile": "36c376f27539ded2a321b2bd432e843b"
   }
