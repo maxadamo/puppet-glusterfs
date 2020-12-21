@@ -9,7 +9,7 @@
 # Learn more about module testing here:
 # https://docs.puppet.com/guides/tests_smoke.html
 #
-$mypeer = $::hostname ? {
+$mypeer = $facts['hostname'] ? {
   'server1' => '192.168.0.2',
   'server2' => '192.168.0.1',
 }
